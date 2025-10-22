@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Advice & Lessons - Caleb Bell</title>
+    <meta name="description" content="Advice and lessons from Caleb Bell and the community">
+    <style>
+        /* Raw forum styling - old school aesthetic */
+        html, body { 
+            height: 100%; 
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #f0f0f0;
+            color: #000;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .nav-container {
+            background: #000;
+            color: #fff;
+            padding: 8px 0;
+            border-bottom: 2px solid #333;
+        }
+        .content {
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            min-height: calc(100vh - 60px);
+        }
+        nav {
+            text-align: center;
+        }
+        nav a {
+            margin: 0 15px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            color: #ccc;
+        }
+        .header-text {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 16px;
+            border: 2px solid #000;
+            padding: 15px;
+            background: #f9f9f9;
+        }
+        .forum-container {
+            max-width: 100%;
+        }
+        .contribution-form {
+            border: 2px solid #000;
+            padding: 20px;
+            margin-bottom: 30px;
+            background: #f9f9f9;
+        }
+        .contributions-section {
+            margin-top: 30px;
+        }
+        .contributions-section h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: left;
+            border-bottom: 1px solid #000;
+            padding-bottom: 5px;
+        }
+        .contribution-form h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .advice-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #000;
+            background: #fff;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .advice-text {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .advice-author {
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #000;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            background: #fff;
+        }
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        .submit-btn {
+            background: #000;
+            color: #fff;
+            padding: 10px 20px;
+            border: 1px solid #000;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .submit-btn:hover {
+            background: #333;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+            border: 1px dashed #ccc;
+            background: #f9f9f9;
+        }
+        a { color: #000; text-decoration: underline; }
+        a:hover { color: #333; }
+    </style>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='white'/><text x='50' y='62' font-size='60' text-anchor='middle' fill='black'>C</text></svg>">
+    <meta name="color-scheme" content="light">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div class="nav-container">
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="advice.html">Advice</a>
+        </nav>
+    </div>
+    <div class="content">
+        <div class="header-text">
+            <p><strong>Advice & lessons, wide open.</strong></p>
+            <p>Share a lesson. Drop advice. Post a quote.</p>
+            <p>For me, for you, for whoever needs it.</p>
+            <p>Add yours to the mix.</p>
+        </div>
+        
+        <div class="forum-container">
+            <div class="contribution-form">
+                <h2>Share Your Wisdom</h2>
+                <p>Drop your advice, lessons learned, or favorite quotes. This space is for everyone.</p>
+                <form id="adviceForm">
+                    <div class="form-group">
+                        <label for="adviceText">Your advice, lesson, or quote:</label>
+                        <textarea id="adviceText" name="adviceText" placeholder="Share your wisdom here... What's something you've learned that others might benefit from?" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="authorName">Your name (optional):</label>
+                        <input type="text" id="authorName" name="authorName" placeholder="Anonymous">
+                    </div>
+                    <button type="submit" class="submit-btn">Share Your Advice</button>
+                </form>
+            </div>
+            
+            <div class="contributions-section">
+                <h2>Community Wisdom</h2>
+                <div id="contributionsList">
+                    <div class="empty-state">
+                        No advice posted yet. Be the first to share your wisdom.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsgXXctLfyZa_S_yUXQotfzsC6nqzDJp8",
+            authDomain: "personal-website-c79e8.firebaseapp.com",
+            databaseURL: "https://personal-website-c79e8-default-rtdb.firebaseio.com",
+            projectId: "personal-website-c79e8",
+            storageBucket: "personal-website-c79e8.firebasestorage.app",
+            messagingSenderId: "838366635311",
+            appId: "1:838366635311:web:8ef2c1491f8ad56c836dda",
+            measurementId: "G-LBNYCSGK30"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Function to format date
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Function to create advice item HTML
+        function createAdviceItem(advice) {
+            return `
+                <div class="advice-item">
+                    <div class="advice-text">"${advice.text}"</div>
+                    <div class="advice-author">— ${advice.author} • ${formatDate(advice.timestamp)}</div>
+                </div>
+            `;
+        }
+
+        // Function to load all advice from Firebase
+        function loadAdvice() {
+            const contributionsList = document.getElementById('contributionsList');
+            
+            database.ref('advice').orderByChild('timestamp').once('value', function(snapshot) {
+                const adviceData = snapshot.val();
+                
+                if (adviceData) {
+                    // Clear empty state
+                    const emptyState = document.querySelector('.empty-state');
+                    if (emptyState) {
+                        emptyState.remove();
+                    }
+                    
+                    // Clear existing content
+                    contributionsList.innerHTML = '';
+                    
+                    // Convert to array and sort by timestamp (newest first)
+                    const adviceArray = Object.values(adviceData).sort((a, b) => b.timestamp - a.timestamp);
+                    
+                    // Add each advice item
+                    adviceArray.forEach(advice => {
+                        const adviceItem = document.createElement('div');
+                        adviceItem.innerHTML = createAdviceItem(advice);
+                        contributionsList.appendChild(adviceItem);
+                    });
+                } else {
+                    // Show empty state if no advice exists
+                    contributionsList.innerHTML = '<div class="empty-state">No advice posted yet. Be the first to share your wisdom.</div>';
+                }
+            });
+        }
+
+        // Function to save advice to Firebase
+        function saveAdvice(adviceText, authorName) {
+            const newAdviceRef = database.ref('advice').push();
+            newAdviceRef.set({
+                text: adviceText,
+                author: authorName,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+        }
+
+        // Form submission handler
+        document.getElementById('adviceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const adviceText = document.getElementById('adviceText').value;
+            const authorName = document.getElementById('authorName').value || 'Anonymous';
+            
+            if (adviceText.trim() === '') {
+                alert('Please enter some advice before posting.');
+                return;
+            }
+            
+            // Save to Firebase
+            saveAdvice(adviceText, authorName);
+            
+            // Clear form
+            document.getElementById('adviceText').value = '';
+            document.getElementById('authorName').value = '';
+            
+            // Show success message
+            alert('Posted! Your wisdom has been added to the forum.');
+        });
+
+        // Load advice when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAdvice();
+        });
+
+        // Listen for real-time updates
+        database.ref('advice').on('value', function(snapshot) {
+            loadAdvice();
+        });
+    </script>
+</body>
+</html>
