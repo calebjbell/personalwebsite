@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Articles - Caleb Bell</title>
+    <meta name="description" content="Articles and thoughts from Caleb Bell">
+    <style>
+        /* Super basic, all white with black text */
+        html, body { height: 100%; }
+        body {
+            margin: 0;
+            background: #fff;
+            color: #000;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+            line-height: 1.5;
+            min-height: 100vh;
+            text-align: center;
+        }
+        .nav-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            padding: 20px 0;
+            z-index: 1000;
+        }
+        .content {
+            margin-top: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 80px);
+        }
+        main {
+            padding: 24px;
+            max-width: 720px;
+            text-align: left;
+        }
+        nav a {
+            margin: 0 20px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        nav a:hover {
+            opacity: 0.7;
+        }
+        .sig { white-space: pre-line; }
+        a { color: #000; text-decoration: underline; }
+        a:hover { opacity: 0.85; }
+        
+        /* Articles specific styles */
+        .articles-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .articles-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        .articles-header p {
+            font-size: 1.1rem;
+            color: #666;
+            margin: 0;
+        }
+        .article-item {
+            border-bottom: 1px solid #eee;
+            padding: 30px 0;
+            margin-bottom: 20px;
+        }
+        .article-item:last-child {
+            border-bottom: none;
+        }
+        .article-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        .article-title a {
+            text-decoration: none;
+            color: #000;
+        }
+        .article-title a:hover {
+            opacity: 0.7;
+        }
+        .article-meta {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .article-description {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .article-link {
+            font-size: 0.9rem;
+            color: #000;
+            text-decoration: underline;
+        }
+        .article-link:hover {
+            opacity: 0.7;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #d32f2f;
+            background: #ffebee;
+            border: 1px solid #ffcdd2;
+            border-radius: 4px;
+        }
+        .no-articles {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='white'/><text x='50' y='62' font-size='60' text-anchor='middle' fill='black'>C</text></svg>">
+    <meta name="color-scheme" content="light">
+</head>
+<body>
+    <div class="nav-container">
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="advice.html">Advice</a>
+            <a href="articles.html">Articles</a>
+        </nav>
+    </div>
+    <div class="content">
+        <main>
+            <div class="articles-header">
+                <h1>Articles</h1>
+                <p>Thoughts, insights, and curiosities from my newsletter</p>
+            </div>
+            
+            <div id="articles-container">
+                <div class="loading">Loading articles...</div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // RSS Feed URL
+        const RSS_FEED_URL = 'https://rss.beehiiv.com/feeds/eolD5rqJXn.xml';
+        
+        // Function to parse RSS XML
+        function parseRSS(xmlText) {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+            
+            // Check for parsing errors
+            const parseError = xmlDoc.querySelector('parsererror');
+            if (parseError) {
+                throw new Error('Failed to parse RSS feed');
+            }
+            
+            const items = xmlDoc.querySelectorAll('item');
+            const articles = [];
+            
+            items.forEach(item => {
+                const title = item.querySelector('title')?.textContent || 'Untitled';
+                const link = item.querySelector('link')?.textContent || '#';
+                const description = item.querySelector('description')?.textContent || '';
+                const pubDate = item.querySelector('pubDate')?.textContent || '';
+                
+                // Format date
+                let formattedDate = '';
+                if (pubDate) {
+                    try {
+                        const date = new Date(pubDate);
+                        formattedDate = date.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                    } catch (e) {
+                        formattedDate = pubDate;
+                    }
+                }
+                
+                articles.push({
+                    title,
+                    link,
+                    description,
+                    pubDate: formattedDate
+                });
+            });
+            
+            return articles;
+        }
+        
+        // Function to create article HTML
+        function createArticleHTML(article) {
+            return `
+                <div class="article-item">
+                    <h2 class="article-title">
+                        <a href="${article.link}" target="_blank" rel="noopener noreferrer">${article.title}</a>
+                    </h2>
+                    <div class="article-meta">${article.pubDate}</div>
+                    <div class="article-description">${article.description}</div>
+                    <a href="${article.link}" target="_blank" rel="noopener noreferrer" class="article-link">Read more →</a>
+                </div>
+            `;
+        }
+        
+        // Function to load and display articles
+        async function loadArticles() {
+            const container = document.getElementById('articles-container');
+            
+            try {
+                // Try direct fetch first (works if CORS allows)
+                let xmlText;
+                try {
+                    const directResponse = await fetch(RSS_FEED_URL);
+                    if (directResponse.ok) {
+                        xmlText = await directResponse.text();
+                    } else {
+                        throw new Error('Direct fetch failed');
+                    }
+                } catch (directError) {
+                    // Fallback to CORS proxy
+                    const proxyResponse = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(RSS_FEED_URL)}`);
+                    
+                    if (!proxyResponse.ok) {
+                        throw new Error(`HTTP error! status: ${proxyResponse.status}`);
+                    }
+                    
+                    const data = await proxyResponse.json();
+                    xmlText = data.contents;
+                }
+                
+                const articles = parseRSS(xmlText);
+                
+                if (articles.length === 0) {
+                    container.innerHTML = '<div class="no-articles">No articles found.</div>';
+                    return;
+                }
+                
+                // Display articles
+                container.innerHTML = articles.map(createArticleHTML).join('');
+                
+            } catch (error) {
+                console.error('Error loading articles:', error);
+                container.innerHTML = `
+                    <div class="error">
+                        <h3>Unable to load articles</h3>
+                        <p>There was an error fetching the articles. Please try again later.</p>
+                        <p><small>Error: ${error.message}</small></p>
+                        <p><small>Make sure your beehiiv RSS feed URL is correct: ${RSS_FEED_URL}</small></p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Load articles when page loads
+        document.addEventListener('DOMContentLoaded', loadArticles);
+    </script>
+</body>
+</html>
+
