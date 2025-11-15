@@ -232,7 +232,7 @@
         function loadAdvice() {
             const contributionsList = document.getElementById('contributionsList');
             
-            database.ref('advice').orderByChild('timestamp').once('value', function(snapshot) {
+            database.ref('submissions').orderByChild('timestamp').once('value', function(snapshot) {
                 const adviceData = snapshot.val();
                 
                 if (adviceData) {
@@ -263,7 +263,7 @@
 
         // Function to save advice to Firebase
         function saveAdvice(adviceText, authorName) {
-            const newAdviceRef = database.ref('advice').push();
+            const newAdviceRef = database.ref('submissions').push();
             newAdviceRef.set({
                 text: adviceText,
                 author: authorName,
@@ -300,7 +300,7 @@
         });
 
         // Listen for real-time updates
-        database.ref('advice').on('value', function(snapshot) {
+        database.ref('submissions').on('value', function(snapshot) {
             loadAdvice();
         });
     </script>
