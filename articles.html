@@ -173,167 +173,53 @@
             </div>
             
             <div id="articles-container">
-                <div class="loading">Loading articles...</div>
+                <!-- Articles will be displayed here -->
             </div>
         </main>
     </div>
     
     <script>
-        // RSS Feed URL
-        const RSS_FEED_URL = 'https://rss.beehiiv.com/feeds/eolD5rqJXn.xml';
-        
-        // Function to parse RSS XML
-        function parseRSS(xmlText) {
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-            
-            // Check for parsing errors
-            const parseError = xmlDoc.querySelector('parsererror');
-            if (parseError) {
-                console.error('RSS Parse Error:', parseError.textContent);
-                throw new Error('Failed to parse RSS feed: ' + parseError.textContent);
+        // Static list of Medium articles
+        const articles = [
+            {
+                title: 'Dialectic Thinking',
+                link: 'https://medium.com/@calbell/dialectic-thinking-110e298893a7',
+                date: '2024' // Update with actual date if desired
             }
-            
-            const items = xmlDoc.querySelectorAll('item');
-            const articles = [];
-            
-            items.forEach(item => {
-                const title = item.querySelector('title')?.textContent || 'Untitled';
-                const link = item.querySelector('link')?.textContent || '#';
-                const description = item.querySelector('description')?.textContent || '';
-                const pubDate = item.querySelector('pubDate')?.textContent || '';
-                
-                // Format date
-                let formattedDate = '';
-                if (pubDate) {
-                    try {
-                        const date = new Date(pubDate);
-                        formattedDate = date.toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        });
-                    } catch (e) {
-                        formattedDate = pubDate;
-                    }
-                }
-                
-                articles.push({
-                    title,
-                    link,
-                    description,
-                    pubDate: formattedDate
-                });
-            });
-            
-            return articles;
-        }
+            // Add more articles here:
+            // {
+            //     title: 'Article Title',
+            //     link: 'https://medium.com/@calbell/article-slug',
+            //     date: '2024'
+            // },
+        ];
         
         // Function to create article HTML
         function createArticleHTML(article, index) {
             return `
                 <a href="${article.link}" target="_blank" rel="noopener noreferrer" class="article-item article-clickable">
                     <h2 class="article-title">${article.title}</h2>
-                    <div class="article-meta">${article.pubDate}</div>
+                    <div class="article-meta">${article.date}</div>
                     <div class="article-link">Read more</div>
                 </a>
             `;
         }
 
-        // Function to load and display articles
-        async function loadArticles() {
+        // Function to display articles
+        function displayArticles() {
             const container = document.getElementById('articles-container');
             
-            try {
-                // Try multiple CORS proxy options
-                const proxies = [
-                    `https://api.allorigins.win/get?url=${encodeURIComponent(RSS_FEED_URL)}`,
-                    `https://corsproxy.io/?${encodeURIComponent(RSS_FEED_URL)}`,
-                    `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(RSS_FEED_URL)}`
-                ];
-                
-                let xmlText = null;
-                let lastError = null;
-                
-                // Try direct fetch first
-                try {
-                    const directResponse = await fetch(RSS_FEED_URL);
-                    if (directResponse.ok) {
-                        xmlText = await directResponse.text();
-                    }
-                } catch (directError) {
-                    lastError = directError;
-                }
-                
-                // If direct fetch failed, try proxies
-                if (!xmlText) {
-                    for (const proxyUrl of proxies) {
-                        try {
-                            const proxyResponse = await fetch(proxyUrl);
-                            
-                            if (!proxyResponse.ok) {
-                                continue;
-                            }
-                            
-                            // Read response as text first (we can only read once)
-                            const responseText = await proxyResponse.text();
-                            
-                            // Check if it's already XML
-                            if (responseText && (responseText.trim().startsWith('<?xml') || responseText.trim().startsWith('<rss'))) {
-                                xmlText = responseText;
-                                break;
-                            }
-                            
-                            // Otherwise try to parse as JSON
-                            try {
-                                const data = JSON.parse(responseText);
-                                const extracted = data.contents || data.data || data;
-                                
-                                if (typeof extracted === 'string' && (extracted.trim().startsWith('<?xml') || extracted.trim().startsWith('<rss'))) {
-                                    xmlText = extracted;
-                                    break;
-                                }
-                            } catch (jsonError) {
-                                // Not valid JSON or XML, continue to next proxy
-                                continue;
-                            }
-                        } catch (proxyError) {
-                            lastError = proxyError;
-                            continue;
-                        }
-                    }
-                }
-                
-                if (!xmlText) {
-                    throw new Error(lastError?.message || 'Failed to fetch RSS feed from all sources');
-                }
-                
-                const articles = parseRSS(xmlText);
-                
-                if (articles.length === 0) {
-                    container.innerHTML = '<div class="no-articles">No articles found. The RSS feed may be empty or the feed URL may be incorrect.</div>';
-                    return;
-                }
-                
-                // Display articles
-                container.innerHTML = articles.map((article, index) => createArticleHTML(article, index)).join('');
-                
-            } catch (error) {
-                console.error('Error loading articles:', error);
-                container.innerHTML = `
-                    <div class="error">
-                        <h3>Unable to load articles</h3>
-                        <p>There was an error fetching the articles. Please try again later.</p>
-                        <p><small>Error: ${error.message}</small></p>
-                        <p><small>RSS Feed URL: ${RSS_FEED_URL}</small></p>
-                        <p><small>Check the browser console for more details.</small></p>
-                    </div>
-                `;
+            if (articles.length === 0) {
+                container.innerHTML = '<div class="no-articles">No articles available.</div>';
+                return;
             }
+            
+            // Display articles
+            container.innerHTML = articles.map((article, index) => createArticleHTML(article, index)).join('');
         }
         
-        // Load articles when page loads
-        document.addEventListener('DOMContentLoaded', loadArticles);
+        // Display articles when page loads
+        document.addEventListener('DOMContentLoaded', displayArticles);
     </script>
 </body>
 </html>
