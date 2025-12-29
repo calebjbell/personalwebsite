@@ -232,8 +232,11 @@
         function loadAdvice() {
             const contributionsList = document.getElementById('contributionsList');
             
-            database.ref('advice').orderByChild('timestamp').once('value', function(snapshot) {
+            // Try to read from advice path
+            database.ref('advice').once('value', function(snapshot) {
                 const adviceData = snapshot.val();
+                
+                console.log('Firebase data received:', adviceData);
                 
                 if (adviceData) {
                     // Clear empty state
@@ -245,19 +248,48 @@
                     // Clear existing content
                     contributionsList.innerHTML = '';
                     
-                    // Convert to array and sort by timestamp (newest first)
-                    const adviceArray = Object.values(adviceData).sort((a, b) => b.timestamp - a.timestamp);
+                    // Convert to array
+                    const adviceArray = Object.entries(adviceData).map(([key, value]) => ({
+                        id: key,
+                        ...value
+                    }));
+                    
+                    // Sort by timestamp if available (newest first), otherwise keep original order
+                    if (adviceArray.length > 0 && adviceArray[0].timestamp) {
+                        adviceArray.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                    }
                     
                     // Add each advice item
                     adviceArray.forEach(advice => {
-                        const adviceItem = document.createElement('div');
-                        adviceItem.innerHTML = createAdviceItem(advice);
-                        contributionsList.appendChild(adviceItem);
+                        // Only display if it has required fields
+                        if (advice.text || advice.message) {
+                            const adviceItem = document.createElement('div');
+                            const adviceText = advice.text || advice.message || 'No text';
+                            const adviceAuthor = advice.author || 'Anonymous';
+                            const adviceTimestamp = advice.timestamp || Date.now();
+                            
+                            adviceItem.innerHTML = `
+                                <div class="advice-item">
+                                    <div class="advice-text">"${adviceText}"</div>
+                                    <div class="advice-author">— ${adviceAuthor} • ${formatDate(adviceTimestamp)}</div>
+                                </div>
+                            `;
+                            contributionsList.appendChild(adviceItem);
+                        }
                     });
+                    
+                    if (contributionsList.children.length === 0) {
+                        contributionsList.innerHTML = '<div class="empty-state">No advice posted yet. Be the first to share your wisdom.</div>';
+                    }
                 } else {
                     // Show empty state if no advice exists
+                    console.log('No data found in Firebase');
                     contributionsList.innerHTML = '<div class="empty-state">No advice posted yet. Be the first to share your wisdom.</div>';
                 }
+            }, function(error) {
+                console.error('Error loading advice:', error);
+                const contributionsList = document.getElementById('contributionsList');
+                contributionsList.innerHTML = '<div class="empty-state">Error loading advice. Please check the browser console for details.</div>';
             });
         }
 
@@ -302,6 +334,8 @@
         // Listen for real-time updates
         database.ref('advice').on('value', function(snapshot) {
             loadAdvice();
+        }, function(error) {
+            console.error('Error in real-time listener:', error);
         });
     </script>
 </body>
