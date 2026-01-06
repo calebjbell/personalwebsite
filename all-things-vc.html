@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Caleb Bell</title>
-    <meta name="description" content="Caleb Bell — personal website">
+    <title>All Things VC - Caleb Bell</title>
+    <meta name="description" content="Venture Opinions - All Things VC">
     <style>
         /* Super basic, all white with black text */
         html, body { height: 100%; }
@@ -15,7 +15,6 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
             line-height: 1.5;
             min-height: 100vh;
-            text-align: center;
         }
         .nav-container {
             position: fixed;
@@ -28,14 +27,15 @@
         }
         .content {
             margin-top: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             min-height: calc(100vh - 80px);
         }
         main {
             padding: 24px;
-            max-width: 720px;
+            max-width: 100%;
+            height: calc(100vh - 80px);
+        }
+        nav {
+            text-align: center;
         }
         nav a {
             margin: 0 20px;
@@ -45,9 +45,18 @@
         nav a:hover {
             opacity: 0.7;
         }
-        .sig { white-space: pre-line; }
         a { color: #000; text-decoration: underline; }
         a:hover { opacity: 0.85; }
+        .notion-container {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        iframe {
+            width: 100%;
+            height: calc(100vh - 80px);
+            border: none;
+        }
     </style>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='white'/><text x='50' y='62' font-size='60' text-anchor='middle' fill='black'>C</text></svg>">
     <meta name="color-scheme" content="light">
@@ -64,24 +73,14 @@
     </div>
     <div class="content">
         <main>
-            <p class="sig">
-Hey, I'm Caleb.
-
-This is my personal corner of the internet, and I'm glad you're here - really.
-
-My hope? That you'll see pieces of your own story here. Questions you've thought about, struggles you've lived, and moments that made you pause and reflect. Stay as long as you'd like, be curious, and remember…
-
-The world is run by those who bother to show up. So show up every single day. Show up for your friends. For your significant other. For your parents. But most importantly…show up for yourself.
-
-If you are working on interesting stuff, send me a message. I would love to learn about what's exciting for you right now, and how I can get involved.
-
-Caleb Bell
-<a href="mailto:caleb@calebjbell.com">caleb@calebjbell.com</a>
-<a href="tel:+19063627419">906-362-7419</a>
-            </p>
+            <iframe 
+                src="https://ventureopinions.notion.site/Venture-Opinions-2e0c477cabd380349fe0ee2981d5cbb2?pvs=73" 
+                class="notion-container"
+                allow="fullscreen"
+                title="Venture Opinions - All Things VC">
+            </iframe>
         </main>
     </div>
 </body>
 </html>
-
 
